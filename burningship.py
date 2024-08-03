@@ -10,7 +10,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Use NumPy to create a 2D array of complex numbers on [-2,2]x[-2,2]
 # Y, X = np.mgrid[-1.3:1.3:0.005, -2:1:0.005]
-Y, X = np.mgrid[-1.3:1.3:0.001, -2:1:0.001]
+Y, X = np.mgrid[-2:1:0.005, -2:2:0.005]
 
 # Load into PyTorch tensors
 x = torch.Tensor(X)
@@ -24,12 +24,14 @@ z = z.to(device)
 zs = zs.to(device)
 ns = ns.to(device)
 
-# Mandelbrot Set
+# Burning Ship Fractal
 for i in range(200):
-    # Compute the new values of z: z^2 + x
-    zs_ = zs * zs + z
+    # Compute the new values of z: (|Re(z)| + |Im(z)|)^2 + c
+    zs_ = (torch.abs(torch.real(zs)) + 1j*torch.abs(torch.imag(zs)))**2 + z
+    
     # Have we diverged with this new value?
     not_diverged = torch.abs(zs_) < 4.0
+
     # Update variables to compute
     ns += not_diverged
     zs = zs_
